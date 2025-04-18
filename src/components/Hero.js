@@ -4,15 +4,15 @@ import { Link } from "react-router-dom";
 function Hero({ styles }) {
   const handleScroll = () => {
     const videoContainer = document.getElementById("video-container");
-    videoContainer.scrollIntoView({ behavior: "smooth" });
+    videoContainer?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <div className={styles.heroDiv}>
       <nav className={styles.headerNav} id="nvbar">
-        <a className={styles.logoA}>
+        <Link to="/" className={styles.logoA}>
           <b className={styles.mailbes}>mailsbe</b>
-        </a>
+        </Link>
         <div className={styles.menuDiv}>
           <Link to="/sign-in" className={styles.loginButton}>
             Login
@@ -24,7 +24,7 @@ function Hero({ styles }) {
                 <img
                   className={styles.iconOutlinearrowRight}
                   alt=""
-                  src="../iconoutlinearrowright6.svg"
+                  src="/iconoutlinearrowright6.svg"
                 />
               </div>
             </div>
@@ -46,14 +46,13 @@ function Hero({ styles }) {
                 <img
                   className={styles.iconOutlinearrowRight}
                   alt=""
-                  src="../iconoutlinearrowright5.svg"
+                  src="/iconoutlinearrowright5.svg"
                 />
               </div>
             </div>
           </Link>
           <button
             className={styles.buttonPrimaryWithIconLeft}
-            autoFocus
             onClick={handleScroll}
           >
             <div className={styles.frameDiv2}>
@@ -61,7 +60,7 @@ function Hero({ styles }) {
                 <img
                   className={styles.iconOutlinearrowRight}
                   alt=""
-                  src="../iconoutlineplay.svg"
+                  src="/iconoutlineplay.svg"
                 />
               </div>
               <b className={styles.buttonName2}>Watch a demo</b>

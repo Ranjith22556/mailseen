@@ -6,30 +6,31 @@ function Features({ styles }) {
       <div className={styles.contentDiv1}>
         <b className={styles.useEmailLikeAGeek}>Use email like a geek</b>
         <div className={styles.exploreTheUnexploredPotenti}>
-          Explore the unexplored potential of email
+          Explore the unexplored potentials.
         </div>
       </div>
       <div className={styles.listDiv}>
         <div className={styles.div}>
-          <img className={styles.sendIcon} alt="" src="../send@2x.png" />
-          <b className={styles.sendB}>Send</b>
+          <div className={styles.sendB}>Send</div>
           <div className={styles.sendEmailDirectlyFromTheD}>
-            Compose a new email with pixel tracking enabled.
+            Send email directly from the dashboard, or just copy the tracking
+            code
           </div>
+          <img className={styles.sendIcon} alt="" src="/send@2x.png" />
         </div>
         <div className={styles.div1}>
-          <img className={styles.vectorIcon} alt="" src="../vector.svg" />
-          <b className={styles.statusB}>Status</b>
+          <div className={styles.statusB}>Status</div>
           <div className={styles.knowIfTheUserReadTheEmai}>
-            Know if the user read the email or not.
+            Know if the user read the email and at what time
           </div>
+          <img className={styles.vectorIcon} alt="" src="/vector.svg" />
         </div>
         <div className={styles.div2}>
-          <img className={styles.vectorIcon1} alt="" src="../vector1.svg" />
-          <b className={styles.historyB}>History</b>
+          <div className={styles.statusB}>Exact Time</div>
           <div className={styles.findOutExactlyWhenTheRece}>
-            Find out exactly when the receiver read your mail.
+            Find out exactly when the receiver opened your email
           </div>
+          <img className={styles.vectorIcon1} alt="" src="/vector1.svg" />
         </div>
       </div>
     </div>

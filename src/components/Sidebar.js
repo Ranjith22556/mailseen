@@ -2,19 +2,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 import { useSignOut } from "@nhost/react";
 
-const Sidebar = ({ styles, user, setPopUp }) => {
+const Sidebar = ({ styles, user, setPopUp, onSignOut }) => {
   const navigate = useNavigate();
   const { signOut } = useSignOut();
 
-  const onLogOutButtonClick = useCallback(() => {
-    signOut();
-    navigate("/");
-  }, [navigate]);
+  const handleSignOut = useCallback(() => {
+    if (onSignOut) {
+      onSignOut();
+      navigate("/");
+    } else {
+      signOut();
+      navigate("/");
+    }
+  }, [navigate, onSignOut, signOut]);
 
-  const name = user?.metadata?.name ? user?.metadata?.name : user.displayName;
+  const name = user?.metadata?.name || user?.metadata?.firstName 
+    ? `${user?.metadata?.firstName || ''} ${user?.metadata?.lastName || ''}`.trim() || user.displayName
+    : user.displayName;
   const email = user.email;
 
-  const image = user.avatarUrl.includes("gravatar.com")
+  const image = user.avatarUrl?.includes("gravatar.com")
     ? user.avatarUrl
     : `https://img.icons8.com/external-linector-lineal-linector/344/external-avatar-man-avatar-linector-lineal-linector-6.png`;
 
@@ -64,7 +71,7 @@ const Sidebar = ({ styles, user, setPopUp }) => {
           </div>
         </div>
       </div>
-      <button className={styles.logOutButton} onClick={onLogOutButtonClick}>
+      <button className={styles.logOutButton} onClick={handleSignOut}>
         <img
           className={styles.moreVerticalIcon}
           alt=""

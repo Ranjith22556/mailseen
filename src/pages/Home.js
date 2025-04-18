@@ -31,14 +31,16 @@ const Home = () => {
 
       <div className={styles.homeDiv}>
         <Hero styles={styles} />
-        <nav className={styles.videoNav} id="video-container">
+        <div className={styles.videoNav} id="video-container">
           <iframe
             className={styles.bGIframe}
             src="https://www.youtube.com/embed/spfi8hGXjrA?rel=0"
             frameBorder="0"
+            title="Email Tracking Demo"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
-        </nav>
+        </div>
         <Features styles={styles} />
         <Footer styles={styles} />
       </div>
