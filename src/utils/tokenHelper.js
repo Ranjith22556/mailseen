@@ -34,6 +34,52 @@ export const getStoredSession = () => {
 };
 
 /**
+ * Extract refresh token from URL and store it
+ * @returns {string|null} The extracted refresh token or null
+ */
+export const extractRefreshTokenFromUrl = () => {
+  // Check for different common token parameter names
+  const urlParams = new URLSearchParams(window.location.search);
+  const refreshToken = urlParams.get('refreshToken') || 
+                       urlParams.get('refresh_token') || 
+                       urlParams.get('token');
+  
+  // Check for hash fragment tokens (common in OAuth flows)
+  if (!refreshToken && window.location.hash) {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const hashToken = hashParams.get('refreshToken') || 
+                      hashParams.get('refresh_token') || 
+                      hashParams.get('token') ||
+                      hashParams.get('access_token'); // Sometimes OAuth returns access token directly
+    
+    if (hashToken) {
+      // Store the token
+      localStorage.setItem('nhostRefreshToken', hashToken);
+      
+      // Clean the URL
+      window.history.replaceState({}, document.title, 
+        window.location.pathname + window.location.search);
+      
+      return hashToken;
+    }
+  }
+  
+  if (refreshToken) {
+    // Store the token
+    localStorage.setItem('nhostRefreshToken', refreshToken);
+    
+    // Clean the URL by removing the token parameter
+    const url = new URL(window.location.href);
+    url.searchParams.delete('refreshToken');
+    url.searchParams.delete('refresh_token');
+    url.searchParams.delete('token');
+    window.history.replaceState({}, document.title, url.toString());
+  }
+  
+  return refreshToken;
+};
+
+/**
  * Clear all auth-related storage
  */
 export const clearAuthStorage = () => {

@@ -12,7 +12,7 @@ import Profile from "./pages/Profile";
 import PageNotFound from "./pages/PageNotFound";
 import ProtectedDashboard from "./components/ProtectedDashboard";
 import Overview from "./pages/Overview";
-import { clearAuthStorage, processAuthError } from "./utils/tokenHelper";
+import { clearAuthStorage, processAuthError, extractRefreshTokenFromUrl } from "./utils/tokenHelper";
 
 const App = () => {
   const [authError, setAuthError] = useState(null);
@@ -44,6 +44,43 @@ const App = () => {
     nhostClient.auth.signOut();
   }, [nhostClient]);
 
+  // Check and handle authentication state on initial load
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Check if we have a valid session
+        const isAuthenticated = await nhostClient.auth.isAuthenticatedAsync();
+        console.log("Authentication status:", isAuthenticated);
+        
+        // Extract refresh token from URL if present (for OAuth flows)
+        const refreshToken = extractRefreshTokenFromUrl();
+        
+        // If we have a refreshToken or we're not authenticated, try to get a session
+        if (refreshToken || !isAuthenticated) {
+          console.log("Attempting to refresh session...");
+          
+          const session = await nhostClient.auth.refreshSession();
+          console.log("Session refresh result:", session ? "Success" : "Failed");
+          
+          // If successful and we're on the root path, redirect to app
+          if (session && window.location.pathname === '/') {
+            console.log("Redirecting to app after successful authentication");
+            window.location.href = '/app';
+          }
+        }
+      } catch (error) {
+        console.error("Authentication error:", error);
+        
+        // Only show error toast if we're not on sign-in page
+        if (window.location.pathname !== '/sign-in') {
+          toast.error("Authentication failed. Please sign in again.");
+        }
+      }
+    };
+    
+    checkAuth();
+  }, [nhostClient]);
+
   // Set up auth error listener
   useEffect(() => {
     const handleAuthChange = ({ event, session, error }) => {
@@ -68,6 +105,11 @@ const App = () => {
       // Other auth state changes
       if (event === 'SIGNED_IN') {
         console.log("User signed in successfully");
+        
+        // Redirect to app if signed in on home page
+        if (window.location.pathname === '/') {
+          window.location.href = '/app';
+        }
       } else if (event === 'SIGNED_OUT') {
         console.log("User signed out");
       }

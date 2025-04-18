@@ -19,7 +19,8 @@ const GoogleSignIn = ({ nhost }) => {
       const currentURL = window.location.origin;
       
       // Build the OAuth URL with proper redirect
-      const redirectUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/signin/provider/google?redirect_to=${encodeURIComponent(currentURL)}/app`;
+      // Ensure Google will redirect back to your app with proper tokens
+      const redirectUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/signin/provider/google?redirect_to=${encodeURIComponent(`${currentURL}/`)}`;
       console.log("Redirecting to:", redirectUrl);
       
       // Redirect to the Google sign-in page
