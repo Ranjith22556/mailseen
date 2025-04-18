@@ -3,6 +3,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "build",
   "framework": "create-react-app",
+  "rootDirectory": ".",
   "env": {
     "REACT_APP_NHOST_SUBDOMAIN": "vymfnovpccjhsfvihzfh",
     "REACT_APP_NHOST_REGION": "ap-south-1",
