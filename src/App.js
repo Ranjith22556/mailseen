@@ -129,19 +129,8 @@ const App = () => {
     console.log("Nhost config:", {
       subdomain: process.env.REACT_APP_NHOST_SUBDOMAIN,
       region: process.env.REACT_APP_NHOST_REGION,
-      backendUrl: process.env.NHOST_BACKEND_URL,
-      vercelUrl: process.env.REACT_APP_VERCEL_URL,
-      nodeEnv: process.env.NODE_ENV,
     });
-    
-    // Log if we can access any of the environment variables
-    console.log("Environment variables available:", {
-      hasSubdomain: !!process.env.REACT_APP_NHOST_SUBDOMAIN,
-      hasRegion: !!process.env.REACT_APP_NHOST_REGION,
-      hasBackendUrl: !!process.env.NHOST_BACKEND_URL,
-      hasVercelUrl: !!process.env.REACT_APP_VERCEL_URL,
-    });
-  }, []);
+  }, []);  // Only run once on mount
 
   // Handle token errors based on Google OAuth documentation
   useEffect(() => {
