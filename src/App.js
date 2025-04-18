@@ -129,8 +129,13 @@ const App = () => {
     console.log("Nhost config:", {
       subdomain: process.env.REACT_APP_NHOST_SUBDOMAIN,
       region: process.env.REACT_APP_NHOST_REGION,
+      envType: process.env.NODE_ENV
     });
-  }, []);  // Only run once on mount
+    
+    if (!process.env.REACT_APP_NHOST_SUBDOMAIN || !process.env.REACT_APP_NHOST_REGION) {
+      console.error("⚠️ CRITICAL: Missing Nhost environment variables!");
+    }
+  }, []);
 
   // Handle token errors based on Google OAuth documentation
   useEffect(() => {

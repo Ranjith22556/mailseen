@@ -1,6 +1,16 @@
 {
   "version": 2,
   "framework": "create-react-app",
+  "env": {
+    "REACT_APP_NHOST_SUBDOMAIN": "vymfnovpccjhsfvihzfh",
+    "REACT_APP_NHOST_REGION": "ap-south-1"
+  },
+  "build": {
+    "env": {
+      "REACT_APP_NHOST_SUBDOMAIN": "vymfnovpccjhsfvihzfh",
+      "REACT_APP_NHOST_REGION": "ap-south-1"
+    }
+  },
   "routes": [
     { "src": "/static/(.*)", "dest": "/static/$1" },
     { "src": "/favicon.ico", "dest": "/favicon.ico" },
