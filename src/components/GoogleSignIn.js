@@ -15,8 +15,11 @@ const GoogleSignIn = ({ nhost }) => {
       const subdomain = process.env.REACT_APP_NHOST_SUBDOMAIN;
       const region = process.env.REACT_APP_NHOST_REGION;
       
-      // Direct redirection to Nhost's Google sign-in URL
-      const redirectUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/signin/provider/google`;
+      // Get the current site URL for redirect_to parameter
+      const currentURL = window.location.origin;
+      
+      // Build the OAuth URL with proper redirect
+      const redirectUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/signin/provider/google?redirect_to=${encodeURIComponent(currentURL)}/app`;
       console.log("Redirecting to:", redirectUrl);
       
       // Redirect to the Google sign-in page
