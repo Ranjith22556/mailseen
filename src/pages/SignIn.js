@@ -14,8 +14,6 @@ import GoogleSignIn from "../components/GoogleSignIn";
 import Spinner from "../components/Spinner";
 import { Helmet } from "react-helmet";
 
-import styles from "../styles/pages/SignIn.module.css";
-
 const SignIn = ({ nhost }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,12 +32,6 @@ const SignIn = ({ nhost }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     signInEmailPassword(email, password);
-  };
-
-  const handleGoogleSignIn = () => {
-    nhost.auth.signIn({
-      provider: "google",
-    });
   };
 
   if (isSuccess || isAuthenticated) {

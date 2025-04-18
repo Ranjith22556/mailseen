@@ -3,99 +3,142 @@ import { NhostClient } from "@nhost/nhost-js";
 const backendUrl = process.env.NHOST_BACKEND_URL;
 const adminSecret = process.env.NHOST_ADMIN_SECRET;
 
+// Log critical configuration for debugging
+console.log("Function configuration:");
+console.log("Backend URL configured:", !!backendUrl);
+console.log("Admin secret configured:", !!adminSecret);
+
 const nhost = new NhostClient({
   backendUrl: backendUrl,
 });
 
-// Set admin secret for the serverless function to have permission to update any email
-if (adminSecret) {
-  nhost.graphql.setAccessToken(adminSecret);
-}
-
 export default async (req, res) => {
-  // get the data from the request
   const imgText = req.query.text;
-  console.log("imgText", imgText);
+  console.log("📨 Tracking pixel requested for img_text:", imgText);
+
+  // Always send a transparent pixel GIF regardless of errors
+  // to avoid broken images in emails
+  const sendTransparentPixel = () => {
+    res.writeHead(200, {
+      "Content-Type": "image/gif",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+    });
+    const transparentGif = Buffer.from(
+      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+      "base64"
+    );
+    res.end(transparentGif);
+  };
 
   if (!imgText) {
-    return res.status(500).json({ error: "No image token provided" });
+    console.error("No image token provided in request");
+    sendTransparentPixel();
+    return;
   }
 
-  // make a get query to get email id using imgText
-  const GET_EMAIL = `
-  query getEmail($imgText: String!) {
-    emails(where: {img_text: {_eq: $imgText}}) {
-      id
-      seen
-    }
-  }`;
+  if (!adminSecret) {
+    console.error("Admin secret is not configured!");
+    sendTransparentPixel();
+    return;
+  }
 
-  // update query with the email id
+  // GraphQL query to get email by img_text
+  const GET_EMAIL = `
+    query getEmail($imgText: String!) {
+      emails(where: {img_text: {_eq: $imgText}}) {
+        id
+        seen
+      }
+    }
+  `;
+
+  // Mutation to update seen status
   const UPDATE_EMAIL = `
     mutation updateEmailSeen($id: Int!, $date: timestamptz!) {
-      update_emails(where: {id: {_eq: $id}}, _set: {seen: true, seen_at: $date}) {
+      update_emails(
+        where: {id: {_eq: $id}}, 
+        _set: {seen: true, seen_at: $date}
+      ) {
         affected_rows
       }
-    }`;
+    }
+  `;
 
   try {
-    console.log("Querying for email with img_text:", imgText);
-    
-    const { data, error } = await nhost.graphql.request(GET_EMAIL, {
-      imgText: imgText,
+    // Step 1: Query to get email ID using img_text
+    console.log(`Making GraphQL request to ${backendUrl}/v1/graphql`);
+    const getResponse = await fetch(`${backendUrl}/v1/graphql`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret": adminSecret,
+      },
+      body: JSON.stringify({
+        query: GET_EMAIL,
+        variables: { imgText },
+      }),
     });
 
-    if (error) {
-      console.error("Error fetching email:", error);
-      return res.status(500).json({ error: error.message });
+    const getResult = await getResponse.json();
+    console.log("Query response:", JSON.stringify(getResult));
+
+    if (getResult.errors) {
+      console.error("GraphQL errors:", getResult.errors);
+      sendTransparentPixel();
+      return;
     }
 
-    if (!data || !data.emails || data.emails.length === 0) {
-      console.error("No email found with img_text:", imgText);
-      return res.status(404).json({ error: "No email found" });
+    if (!getResult.data || !getResult.data.emails || !getResult.data.emails.length) {
+      console.error("Email not found with img_text:", imgText);
+      sendTransparentPixel();
+      return;
     }
 
-    console.log("Found email:", data.emails[0]);
+    const email = getResult.data.emails[0];
+    console.log("📧 Found email:", email);
 
-    // extract the email id from the response
-    const emailId = data.emails[0].id;
-    const alreadySeen = data.emails[0].seen;
-
-    if (alreadySeen) {
-      console.log("Email already marked as seen");
-      return res.status(200).json({ message: "Email already seen" });
+    if (email.seen) {
+      console.log("✅ Email already marked as seen");
+      sendTransparentPixel();
+      return;
     }
 
-    console.log("Updating email seen status for ID:", emailId);
-    
-    // update the seen status in emails table
-    const { data: updatedData, error: updateError } =
-      await nhost.graphql.request(UPDATE_EMAIL, {
-        id: emailId,
-        date: new Date().toISOString(),
-      });
+    const emailId = email.id;
+    const now = new Date().toISOString();
 
-    if (updateError) {
-      console.error("Error updating email:", updateError);
-      return res.status(500).json({ error: updateError.message });
-    }
-
-    console.log("Successfully updated email seen status");
-    
-    // Return 1x1 transparent pixel GIF
-    res.writeHead(200, {
-      'Content-Type': 'image/gif',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
+    // Step 2: Mutation to update seen status
+    console.log(`Updating email ID ${emailId} as seen at ${now}`);
+    const updateResponse = await fetch(`${backendUrl}/v1/graphql`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret": adminSecret,
+      },
+      body: JSON.stringify({
+        query: UPDATE_EMAIL,
+        variables: { id: emailId, date: now },
+      }),
     });
-    
-    // 1x1 transparent GIF
-    const transparentGif = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
-    res.end(transparentGif);
-    
+
+    const updateResult = await updateResponse.json();
+    console.log("Update response:", JSON.stringify(updateResult));
+
+    if (updateResult.errors) {
+      console.error("❌ Error updating email:", updateResult.errors);
+      sendTransparentPixel();
+      return;
+    }
+
+    console.log("✅ Successfully updated email seen status, affected rows:", 
+      updateResult.data?.update_emails?.affected_rows || 0);
+
+    // Return transparent pixel
+    sendTransparentPixel();
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: error.message || "Unknown error occurred" });
+    console.error("🔥 Unexpected error:", error);
+    // Always return a valid image even if there's an error
+    sendTransparentPixel();
   }
 };

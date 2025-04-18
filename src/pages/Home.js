@@ -37,6 +37,7 @@ const Home = () => {
             src="https://www.youtube.com/embed/spfi8hGXjrA?rel=0"
             frameBorder="0"
             allowFullScreen
+            title="Mailsbe Demo Video"
           />
         </nav>
         <Features styles={styles} />
