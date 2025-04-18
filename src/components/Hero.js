@@ -10,7 +10,7 @@ function Hero({ styles }) {
   return (
     <div className={styles.heroDiv}>
       <nav className={styles.headerNav} id="nvbar">
-        <a href="/" className={styles.logoA}>
+        <a className={styles.logoA}>
           <b className={styles.mailbes}>mailsbe</b>
         </a>
         <div className={styles.menuDiv}>

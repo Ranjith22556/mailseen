@@ -4,7 +4,7 @@ import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { useUserData } from "@nhost/react";
 import { CircularProgress } from "@mui/material";
 import toast from "react-hot-toast";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 
 const GET_EMAILS = gql`
   query getEmails($user: String) {
@@ -32,29 +32,29 @@ const EmailsTable = ({ styles }) => {
   const user = useUserData();
   const [emails, setEmails] = useState([]);
 
-  const [getEmails, { loading, data }] = useLazyQuery(GET_EMAILS, {
+  const [getEmails, { loading, error, data }] = useLazyQuery(GET_EMAILS, {
     variables: { user: user.id },
   });
 
-  const [deleteTodo] = useMutation(DELETE_EMAIL);
+  const [deleteTodo, { loading: deleting, error: deleteError }] =
+    useMutation(DELETE_EMAIL);
 
-  const fetchEmails = useCallback(async () => {
+  const fetchEmails = async () => {
     try {
       await getEmails({
         variables: { user: user.id },
       });
 
-      if (data && data.emails) {
-        setEmails(data.emails);
-      }
+      // toast.success("Emails fetched successfully");
+      setEmails(data.emails);
     } catch (err) {
       console.log(err);
     }
-  }, [getEmails, user.id, data]);
+  };
 
   useEffect(() => {
     fetchEmails();
-  }, [fetchEmails]);
+  }, [data, user]);
 
   const deleteEmail = async (id) => {
     const confirmation = window.confirm(

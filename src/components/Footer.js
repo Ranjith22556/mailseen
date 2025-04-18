@@ -37,7 +37,6 @@ function Footer({ styles }) {
               className={styles.a}
               href="https://twitter.com/aashishpanthi11"
               target="_blank"
-              rel="noreferrer"
             >
               <img
                 className={styles.logoTwitter2Icon}
@@ -49,7 +48,6 @@ function Footer({ styles }) {
               className={styles.a1}
               href="https://facebook.com/aashishpanthi11"
               target="_blank"
-              rel="noreferrer"
             >
               <img
                 className={styles.logoFbSimple2Icon}
@@ -61,7 +59,6 @@ function Footer({ styles }) {
               className={styles.a2}
               href="https://instagram.com/aashishpanthi11"
               target="_blank"
-              rel="noreferrer"
             >
               <img
                 className={styles.logoInstagram1Icon}
@@ -86,9 +83,9 @@ function Footer({ styles }) {
           >
             About
           </a>
-          <a className={styles.career} href="#">Career</a>
-          <a className={styles.worksA} href="#">Works</a>
-          <a className={styles.features} href="#">Features</a>
+          <a className={styles.career}>Career</a>
+          <a className={styles.worksA}>Works</a>
+          <a className={styles.features}>Features</a>
         </div>
         <div className={styles.widget2Div}>
           <b className={styles.hELPMENUB}>Help</b>

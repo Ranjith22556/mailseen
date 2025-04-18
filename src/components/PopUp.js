@@ -44,7 +44,7 @@ const PopUp = ({ setPopUp }) => {
   const [name, setName] = useState(user.displayName);
   const [imgText, setImgText] = useState("");
 
-  const [addEmail, { loading, error }] = useMutation(ADD_EMAIL);
+  const [addEmail, { data, loading, error }] = useMutation(ADD_EMAIL);
 
   const ref = useRef();
 
@@ -137,7 +137,6 @@ const PopUp = ({ setPopUp }) => {
                   className={styles.pixelImg}
                   width={1}
                   height={1}
-                  alt="Tracking pixel"
                 />
                 {name && name.substring(1, name.length)}
               </div>
