@@ -17,23 +17,24 @@ import { gql, useMutation } from "@apollo/client";
 
 const ADD_EMAIL = gql`
   mutation addEmail(
-    $email: String
-    $description: String
+    $sent_to: String
+    $subject: String
     $img_text: String
-    $user: String
+    $user_id: uuid
   ) {
     insert_emails(
       objects: {
-        description: $description
-        email: $email
+        sent_to: $sent_to
+        subject: $subject
         img_text: $img_text
-        user: $user
+        user_id: $user_id
       }
     ) {
       affected_rows
     }
   }
 `;
+
 
 const PopUp = ({ setPopUp }) => {
   //get the user data
@@ -50,14 +51,14 @@ const PopUp = ({ setPopUp }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       await addEmail({
         variables: {
-          email: email,
-          description: description,
+          sent_to: email,
+          subject: description,
           img_text: imgText.split("=")[1],
-          user: user.id,
+          user_id: user.id,
         },
       });
       toast.success("Email added successfully");
@@ -66,7 +67,7 @@ const PopUp = ({ setPopUp }) => {
     } catch (err) {
       toast.error("Unable to add email");
     }
-  };
+  };  
 
   useEffect(() => {
     const time = new Date().getTime();
