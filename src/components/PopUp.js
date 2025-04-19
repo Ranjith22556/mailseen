@@ -148,7 +148,7 @@ const PopUp = ({ setPopUp }) => {
             </div>
 
             {error && (
-              <FormHelperText>{`Error occured! ${error.message}`}</FormHelperText>
+              <FormHelperText>{`Error occurred! ${error.message}`}</FormHelperText>
             )}
 
             <LoadingButton

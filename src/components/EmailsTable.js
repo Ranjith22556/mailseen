@@ -46,6 +46,14 @@ const EmailsTable = ({ styles }) => {
       });
 
       // toast.success("Emails fetched successfully");
+      if (error) {
+        return <div className={styles.loader}>Error loading emails</div>;
+      }
+
+      if (!data || !data.emails) {
+        return <div className={styles.loader}>No emails found</div>;
+      }
+
       setEmails(data.emails);
     } catch (err) {
       console.log(err);
