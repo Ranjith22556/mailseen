@@ -18,9 +18,9 @@ import styles from "../styles/components/Popup.module.css";
 const ADD_EMAIL = gql`
   mutation AddEmail($sent_to: String!, $description: String!, $name: String!) {
   insert_emails(objects: {
-    email: $sent_to,
-    subject: $subject,
-    img_text: $img_text
+    sent_to: $sent_to,
+    subject: $description,
+    img_text: $name
   }) {
     affected_rows
   }
