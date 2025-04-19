@@ -19,12 +19,13 @@ const ADD_EMAIL = gql`
   mutation AddEmail($sent_to: String!, $description: String!, $name: String!) {
   insert_emails(objects: {
     sent_to: $sent_to,
-    description: $description,
-    name: $name
+    subject: $description,
+    img_text: $name
   }) {
     affected_rows
   }
 }
+
 
 `;
 
