@@ -18,19 +18,17 @@ import styles from "../styles/components/Popup.module.css";
 // ✅ Clean mutation matching your updated Hasura table
 const ADD_EMAIL = gql`
   mutation AddEmail(
-    $email: String!
+    $sent_to: String!
     $description: String!
     $img_text: String!
     $user_id: uuid!
-    $name: String!
   ) {
     insert_emails(
       objects: {
-        email: $email
-        description: $description
+        sent_to: $sent_to
+        subject: $description
         img_text: $img_text
         user_id: $user_id
-        name: $name
       }
     ) {
       affected_rows
@@ -63,11 +61,10 @@ const PopUp = ({ setPopUp }) => {
     try {
       await addEmail({
         variables: {
-          email,
+          sent_to: email,
           description,
           img_text: imgText.split("=")[1],
           user_id: user.id,
-          name,
         },
       });
       toast.success("Email added successfully");
