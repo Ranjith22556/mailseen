@@ -1,5 +1,4 @@
 import { gql, useMutation } from "@apollo/client";
-import { ADD_EMAIL } from "../utils/mutations";
 import {
   TextField,
   Typography,
