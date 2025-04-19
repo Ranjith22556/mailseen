@@ -1,3 +1,5 @@
+import { gql, useMutation } from "@apollo/client";
+import { ADD_EMAIL } from "../utils/mutations";
 import {
   TextField,
   Typography,
@@ -11,23 +13,25 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import toast from "react-hot-toast";
 import { useUserData } from "@nhost/react";
 import { useState, useEffect, useRef } from "react";
-import { gql, useMutation } from "@apollo/client";
 
 import styles from "../styles/components/Popup.module.css";
 
+// ✅ Clean mutation matching your updated Hasura table
 const ADD_EMAIL = gql`
-  mutation addEmail(
-    $sent_to: String
-    $subject: String
-    $img_text: String
-    $user_id: uuid
+  mutation AddEmail(
+    $email: String!
+    $description: String!
+    $img_text: String!
+    $user_id: uuid!
+    $name: String!
   ) {
     insert_emails(
       objects: {
-        sent_to: $sent_to
-        subject: $subject
+        email: $email
+        description: $description
         img_text: $img_text
         user_id: $user_id
+        name: $name
       }
     ) {
       affected_rows
@@ -38,25 +42,33 @@ const ADD_EMAIL = gql`
 const PopUp = ({ setPopUp }) => {
   const user = useUserData();
 
-  const [sentTo, setSentTo] = useState("");
-  const [subject, setSubject] = useState("");
+  const [email, setEmail] = useState("");
+  const [description, setDescription] = useState("");
   const [name, setName] = useState(user.displayName);
   const [imgText, setImgText] = useState("");
 
-  const [addEmail, { data, loading, error }] = useMutation(ADD_EMAIL);
-
+  const [addEmail, { loading, error }] = useMutation(ADD_EMAIL);
   const ref = useRef();
+
+  // ✅ Generate image text URL when component mounts
+  useEffect(() => {
+    const time = new Date().getTime();
+    setImgText(
+      `https://iilmhggnkfgwthovbcrf.nhost.run/v1/functions/update?text=${time}`
+    );
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       await addEmail({
         variables: {
-          sent_to: sentTo,
-          subject: subject,
+          email,
+          description,
           img_text: imgText.split("=")[1],
           user_id: user.id,
+          name,
         },
       });
       toast.success("Email added successfully");
@@ -65,14 +77,7 @@ const PopUp = ({ setPopUp }) => {
     } catch (err) {
       toast.error(`Unable to add email: ${err.message}`);
     }
-  };  
-
-  useEffect(() => {
-    const time = new Date().getTime();
-    setImgText(
-      `https://iilmhggnkfgwthovbcrf.nhost.run/v1/functions/update?text=${time}`
-    );
-  }, []);
+  };
 
   return (
     <div className={styles.popup}>
@@ -81,11 +86,11 @@ const PopUp = ({ setPopUp }) => {
           <Typography variant="h6" component="h4">
             Enter new email details
           </Typography>
-
           <IconButton aria-label="close" onClick={() => setPopUp(false)}>
             <HighlightOffIcon />
           </IconButton>
         </div>
+
         <form className={styles.groupForm} onSubmit={handleSubmit}>
           <FormControl sx={{ m: 0, width: "100%" }} error={Boolean(error)}>
             <TextField
@@ -98,8 +103,8 @@ const PopUp = ({ setPopUp }) => {
               size="medium"
               margin="none"
               required
-              value={sentTo}
-              onChange={(e) => setSentTo(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <TextField
@@ -111,8 +116,9 @@ const PopUp = ({ setPopUp }) => {
               helperText="This text will help to separate emails."
               required
               fullWidth
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              sx={{ mt: 2 }}
             />
 
             <TextField
@@ -125,6 +131,7 @@ const PopUp = ({ setPopUp }) => {
               fullWidth
               value={name}
               onChange={(e) => setName(e.target.value)}
+              sx={{ mt: 2 }}
             />
 
             <div className={styles.copyBox}>
@@ -137,7 +144,7 @@ const PopUp = ({ setPopUp }) => {
                   height={1}
                   alt=""
                 />
-                {name && name.substring(1, name.length)}
+                {name && name.substring(1)}
               </div>
               <span className={styles.imgHelperText}>
                 Copy this text and paste it in the email.{" "}
@@ -158,6 +165,7 @@ const PopUp = ({ setPopUp }) => {
               fullWidth
               type="submit"
               loading={loading}
+              sx={{ mt: 2 }}
             >
               Save
             </LoadingButton>
