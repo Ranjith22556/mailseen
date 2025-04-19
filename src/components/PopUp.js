@@ -10,10 +10,10 @@ import SaveIcon from "@mui/icons-material/Save";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import toast from "react-hot-toast";
 import { useUserData } from "@nhost/react";
-
-import styles from "../styles/components/Popup.module.css";
 import { useState, useEffect, useRef } from "react";
 import { gql, useMutation } from "@apollo/client";
+
+import styles from "../styles/components/Popup.module.css";
 
 const ADD_EMAIL = gql`
   mutation addEmail(
@@ -35,13 +35,11 @@ const ADD_EMAIL = gql`
   }
 `;
 
-
 const PopUp = ({ setPopUp }) => {
-  //get the user data
   const user = useUserData();
 
-  const [email, setEmail] = useState("");
-  const [description, setDescription] = useState("");
+  const [sentTo, setSentTo] = useState("");
+  const [subject, setSubject] = useState("");
   const [name, setName] = useState(user.displayName);
   const [imgText, setImgText] = useState("");
 
@@ -55,8 +53,8 @@ const PopUp = ({ setPopUp }) => {
     try {
       await addEmail({
         variables: {
-          sent_to: email,
-          subject: description,
+          sent_to: sentTo,
+          subject: subject,
           img_text: imgText.split("=")[1],
           user_id: user.id,
         },
@@ -65,14 +63,14 @@ const PopUp = ({ setPopUp }) => {
       setPopUp(false);
       window.location.reload();
     } catch (err) {
-      toast.error("Unable to add email");
+      toast.error(`Unable to add email: ${err.message}`);
     }
   };  
 
   useEffect(() => {
     const time = new Date().getTime();
     setImgText(
-      `https://tkjfsvqlulofoefmacvj.nhost.run/v1/functions/update?text=${time}`
+      `https://iilmhggnkfgwthovbcrf.nhost.run/v1/functions/update?text=${time}`
     );
   }, []);
 
@@ -89,9 +87,8 @@ const PopUp = ({ setPopUp }) => {
           </IconButton>
         </div>
         <form className={styles.groupForm} onSubmit={handleSubmit}>
-          <FormControl sx={{ m: 0, width: "100%" }} error={error}>
+          <FormControl sx={{ m: 0, width: "100%" }} error={Boolean(error)}>
             <TextField
-              className={styles.inputOutlinedTextField}
               fullWidth
               color="primary"
               variant="outlined"
@@ -101,21 +98,21 @@ const PopUp = ({ setPopUp }) => {
               size="medium"
               margin="none"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={sentTo}
+              onChange={(e) => setSentTo(e.target.value)}
             />
+
             <TextField
-              className={styles.textAreaOutlinedTextField}
               color="primary"
               variant="outlined"
               multiline
               label="Description"
-              placeholder="Some distinct description"
-              helperText="This text will help to seperate emails."
+              placeholder="Some distinct subject"
+              helperText="This text will help to separate emails."
               required
               fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
             />
 
             <TextField
@@ -138,6 +135,7 @@ const PopUp = ({ setPopUp }) => {
                   className={styles.pixelImg}
                   width={1}
                   height={1}
+                  alt=""
                 />
                 {name && name.substring(1, name.length)}
               </div>
@@ -148,7 +146,7 @@ const PopUp = ({ setPopUp }) => {
             </div>
 
             {error && (
-              <FormHelperText>{`Error occurred! ${error.message}`}</FormHelperText>
+              <FormHelperText>{`Error occurred: ${error.message}`}</FormHelperText>
             )}
 
             <LoadingButton
