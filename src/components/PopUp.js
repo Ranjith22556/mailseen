@@ -70,7 +70,7 @@ const PopUp = ({ setPopUp }) => {
   useEffect(() => {
     const time = new Date().getTime();
     setImgText(
-      `https://tkjfsvqlulofoefmacvj.nhost.run/v1/functions/update?text=${time}`
+      `https://iilmhggnkfgwthovbcrf.nhost.run/v1/functions/update?text=${time}`
     );
   }, []);
 
