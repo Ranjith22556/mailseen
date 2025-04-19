@@ -17,17 +17,17 @@ import { gql, useMutation } from "@apollo/client";
 
 const ADD_EMAIL = gql`
   mutation addEmail(
-    $email: String
-    $description: String
+    $sent_to: String
+    $subject: String
     $img_text: String
-    $user: String
+    $user_id: uuid
   ) {
     insert_emails(
       objects: {
-        description: $description
-        email: $email
+        sent_to: $sent_to
+        subject: $subject
         img_text: $img_text
-        user: $user
+        user_id: $user_id
       }
     ) {
       affected_rows
