@@ -35,6 +35,7 @@ const ADD_EMAIL = gql`
   }
 `;
 
+
 const PopUp = ({ setPopUp }) => {
   //get the user data
   const user = useUserData();
@@ -50,14 +51,14 @@ const PopUp = ({ setPopUp }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       await addEmail({
         variables: {
-          email: email,
-          description: description,
+          sent_to: email,
+          subject: description,
           img_text: imgText.split("=")[1],
-          user: user.id,
+          user_id: user.id,
         },
       });
       toast.success("Email added successfully");
@@ -66,7 +67,7 @@ const PopUp = ({ setPopUp }) => {
     } catch (err) {
       toast.error("Unable to add email");
     }
-  };
+  };  
 
   useEffect(() => {
     const time = new Date().getTime();
